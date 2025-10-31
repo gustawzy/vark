@@ -63,7 +63,7 @@ function selectAnswer(type, option) {
 
   currentQuestion++;
   if (currentQuestion < questions.length) {
-    setTimeout(showQuestion, 400);
+    setTimeout(showQuestion, 100);
   } else {
     showResult();
   }
