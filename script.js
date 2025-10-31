@@ -58,6 +58,10 @@ function showQuestion() {
 }
 
 function selectAnswer(type, option) {
+  // desativa todas as opções depois do clique
+  const options = document.querySelectorAll('.option');
+  options.forEach(btn => btn.onclick = null);
+
   if (option === "Sim") scores[type] += 2;
   if (option === "Mais ou menos") scores[type] += 1;
 
