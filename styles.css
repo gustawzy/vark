@@ -100,3 +100,11 @@ body {
   margin-bottom: 20px;
   animation: fadeIn 0.5s;
 }
+
+#result-text {
+  font-size: 2.2rem; /* maior que o texto normal, mas menor que o título */
+  color: #b76eff;    /* mesma cor do título */
+  text-shadow: 0 0 15px #b76eff;
+  margin: 20px 0 40px 0; /* dá espaço entre o resultado e o botão */
+  font-weight: 700;
+}
