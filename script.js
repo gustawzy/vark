@@ -1,23 +1,27 @@
 const questions = [
   // Visual
-  { type: "Visual", question: "Você entende melhor quando vê gráficos ou diagramas?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Visual", question: "Prefere mapas e imagens a textos longos?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Visual", question: "Gosta de usar cores e desenhos para organizar ideias?", options: ["Sim", "Mais ou menos", "Não"] },
-  
+  { type: "Visual", question: "Você entende melhor quando vê gráficos, diagramas ou imagens explicando algo?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Visual", question: "Você prefere mapas e imagens do que textos longos?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Visual", question: "Você gosta de usar cores, setas ou desenhos para organizar suas ideias?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Visual", question: "Você lembra melhor de informações quando vê imagens do que quando apenas lê ou ouve?", options: ["Sim", "Mais ou menos", "Não"] },
+
   // Auditivo
-  { type: "Auditivo", question: "Aprende melhor ouvindo explicações?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Auditivo", question: "Gosta de estudar com música?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Auditivo", question: "Lembra melhor do que ouve do que do que lê?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Auditivo", question: "Você aprende melhor ouvindo explicações em vez de apenas ler?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Auditivo", question: "Você costuma prestar mais atenção quando alguém fala do que quando lê um texto?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Auditivo", question: "Você gosta de estudar ouvindo música ou podcasts?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Auditivo", question: "Você entende melhor quando conversa sobre o assunto com outras pessoas?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Leitura/Escrita
-  { type: "Leitura/Escrita", question: "Prefere ler instruções do que ver vídeos?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Leitura/Escrita", question: "Gosta de escrever anotações e resumos?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Leitura/Escrita", question: "Aprende melhor lendo textos e artigos?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Leitura/Escrita", question: "Você prefere ler instruções em vez de assistir a vídeos explicativos?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Leitura/Escrita", question: "Você gosta de escrever anotações, resumos ou listas para lembrar das coisas?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Leitura/Escrita", question: "Você entende melhor um conteúdo quando o lê por conta própria?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Leitura/Escrita", question: "Você tem facilidade em aprender lendo textos, artigos ou livros?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Cinestésico
-  { type: "Cinestésico", question: "Aprende melhor praticando?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Cinestésico", question: "Prefere atividades físicas a teóricas?", options: ["Sim", "Mais ou menos", "Não"] },
-  { type: "Cinestésico", question: "Entende melhor quando faz algo com as mãos?", options: ["Sim", "Mais ou menos", "Não"] }
+  { type: "Cinestésico", question: "Você aprende melhor fazendo algo na prática do que só ouvindo ou lendo?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Cinestésico", question: "Você prefere atividades que envolvem movimento ou ação?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Cinestésico", question: "Você entende melhor quando participa ou experimenta o que está aprendendo?", options: ["Sim", "Mais ou menos", "Não"] },
+  { type: "Cinestésico", question: "Você tem mais facilidade em lembrar de algo quando coloca a mão na massa?", options: ["Sim", "Mais ou menos", "Não"] }
 ];
 
 const startBtn = document.getElementById("start-btn");
