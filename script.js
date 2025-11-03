@@ -24,15 +24,14 @@ const questions = [
   { type: "Cinestésico", question: "Você tem mais facilidade em lembrar de algo quando pratica?", options: ["Sim", "Mais ou menos", "Não"] }
 ];
 
-// função para embaralhar arrays
+// embaralhar perguntas
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
-
-shuffle(questions); // embaralha as perguntas
+shuffle(questions);
 
 const startBtn = document.getElementById("start-btn");
 const quizContainer = document.getElementById("quiz-container");
@@ -43,7 +42,6 @@ const scoreTable = document.getElementById("score-table");
 const restartBtn = document.getElementById("restart-btn");
 
 let currentQuestion = 0;
-// pontuação agora: Sim = 1, Mais ou menos = 0.5, Não = 0
 let scores = { Visual: 0, Auditivo: 0, "Leitura/Escrita": 0, Cinestésico: 0 };
 
 startBtn.addEventListener("click", startQuiz);
@@ -63,14 +61,12 @@ function showQuestion() {
   questionEl.textContent = q.question;
   quizContainer.appendChild(questionEl);
 
-  // mantém as opções na ordem original
   q.options.forEach(option => {
     const btn = document.createElement("div");
     btn.textContent = option;
     btn.classList.add("option");
     btn.setAttribute("role", "button");
     btn.setAttribute("tabindex", "0");
-    // permitir seleção por Enter/Space para acessibilidade
     btn.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -83,27 +79,19 @@ function showQuestion() {
 }
 
 function selectAnswer(type, option, clickedBtn) {
-  // desativa todas as opções depois do clique
-  const options = document.querySelectorAll('.option');
-  options.forEach(btn => {
+  document.querySelectorAll('.option').forEach(btn => {
     btn.onclick = null;
     btn.classList.add('disabled');
   });
 
-  // aplicação da regra: Sim = 1, Mais ou menos = 0.5, Não = 0
   if (option === "Sim") scores[type] += 1;
   if (option === "Mais ou menos") scores[type] += 0.5;
-  // "Não" não adiciona nada
 
-  // pequeno feedback visual
-  if (clickedBtn) {
-    clickedBtn.classList.remove('disabled');
-    clickedBtn.style.boxShadow = "0 0 18px rgba(183,110,255,0.5)";
-  }
+  clickedBtn.classList.remove('disabled');
+  clickedBtn.style.boxShadow = "0 0 18px rgba(183,110,255,0.5)";
 
   currentQuestion++;
   if (currentQuestion < questions.length) {
-    // curtíssima pausa para UX
     setTimeout(showQuestion, 160);
   } else {
     setTimeout(showResult, 220);
@@ -114,19 +102,13 @@ function showResult() {
   quizContainer.classList.add("hidden");
   resultContainer.classList.remove("hidden");
 
-  // calcular resultado
   const values = Object.values(scores);
   const maxScore = Math.max(...values);
   const minScore = Math.min(...values);
-
-  // tolerância para considerar "quase igual" -> ajustável
   const TOLERANCE = 0.5;
 
-  // identificar todos os estilos que alcançam a pontuação máxima (empate exato)
-  let bestTypes = Object.keys(scores).filter(type => Math.abs(scores[type] - maxScore) < 1e-9);
-
-  // checar Multimodal Total (todos os 4 bem próximos)
-  let isMultimodalTotal = (maxScore - minScore) <= TOLERANCE;
+  const bestTypes = Object.keys(scores).filter(type => Math.abs(scores[type] - maxScore) < 1e-9);
+  const isMultimodalTotal = (maxScore - minScore) <= TOLERANCE;
 
   let resultLabel = "";
   if (isMultimodalTotal) {
@@ -134,35 +116,38 @@ function showResult() {
   } else if (bestTypes.length === 1) {
     resultLabel = `${bestTypes[0]} (Unimodal)`;
   } else {
-    // Multimodal parcial (2 ou 3 estilos empatados como maiores)
     resultLabel = `Multimodal (${bestTypes.join(" + ")})`;
   }
-
-  // exibir resultado principal
   resultText.textContent = resultLabel;
 
-  // montar explicação curta
+  // textos específicos por estilo
+  const explanations = {
+    "Visual": "Você aprende melhor vendo. Diagramas, esquemas, vídeos e gráficos te ajudam a entender rápido. Prefira usar cores, desenhos e anotações visuais — tipo mapas mentais e slides bem ilustrados. Evite explicações muito faladas sem imagens, isso pode te distrair.",
+    "Auditivo": "Seu aprendizado vem pelo som. Você grava melhor quando ouve explicações, debates ou podcasts. Repetir o conteúdo em voz alta e conversar sobre o assunto ajuda a fixar. Se puder, estude explicando pra alguém ou ouvindo áudios educativos.",
+    "Leitura/Escrita": "Você se dá bem com textos. Lendo e escrevendo é onde seu cérebro brilha. Prefira apostilas, artigos, listas e resumos. Escrever o que entendeu e reler com calma faz o conteúdo grudar. Transformar vídeos e aulas faladas em anotações também é uma boa.",
+    "Cinestésico": "Você aprende com a prática. O movimento e o toque te ajudam mais do que ouvir ou ler. Experimente, monte, faça testes e se envolva fisicamente. Aprender só lendo ou vendo te deixa entediado rápido, então traz o conteúdo pra realidade com ações."
+  };
+
   let explanation = "";
   if (isMultimodalTotal) {
-    explanation = "Você tem pontuações bem próximas nos quatro estilos — adapta-se bem a várias formas de aprendizado. Tenta misturar técnicas (gráficos, áudio, leitura e prática).";
+    explanation = "Você tem pontuações bem próximas nos quatro estilos — se adapta fácil a qualquer forma de aprendizado. Misture técnicas: leia, ouça, desenhe e pratique.";
   } else if (bestTypes.length === 1) {
-    explanation = `Seu estilo dominante parece ser <strong>${bestTypes[0]}</strong>. Aproveite métodos focados nesse estilo para aprender mais rápido.`;
+    const tipo = bestTypes[0];
+    explanation = `<strong>${tipo}</strong>: ${explanations[tipo]}`;
   } else {
-    explanation = `Você tem preferência por múltiplos estilos: <strong>${bestTypes.join("</strong> e <strong>")}</strong>. Combine estratégias desses estilos para melhores resultados.`;
+    explanation = `Você tem preferência por múltiplos estilos: <strong>${bestTypes.join("</strong>, <strong>")}</strong>. Use o melhor de cada um:<br><br>`;
+    bestTypes.forEach(t => {
+      explanation += `<strong>${t}:</strong> ${explanations[t]}<br><br>`;
+    });
   }
+
   resultExplanation.innerHTML = explanation;
 
-  // construir tabela de pontuação (ordenada)
   const sorted = Object.entries(scores)
     .map(([k, v]) => ({ k, v }))
     .sort((a, b) => b.v - a.v);
 
-  // limpar tabela
   scoreTable.innerHTML = "";
-
-  // calcular maior possível para normalizar barras (max perguntas por tipo = 4 * 1 = 4)
-  // mas usamos o max alcançado para animação visual.
-  const maxPossible = 4; // 4 perguntas por estilo * 1 ponto por pergunta
   const highest = Math.max(...sorted.map(x => x.v), 1);
 
   sorted.forEach(row => {
@@ -174,7 +159,6 @@ function showResult() {
 
     const tdValue = document.createElement('td');
     tdValue.classList.add('score-value');
-    // mostrar com uma casa decimal quando tiver .5
     tdValue.textContent = (Number.isInteger(row.v) ? row.v.toString() : row.v.toFixed(1));
 
     const tdBar = document.createElement('td');
@@ -186,9 +170,8 @@ function showResult() {
     const barFill = document.createElement('div');
     barFill.classList.add('bar-fill');
 
-    // largura relativa (0% - 100%) baseada no maior valor alcançado (para destacar)
     const widthPercent = Math.round((row.v / highest) * 100);
-    barFill.style.width = "0%"; // iniciar em 0 para animar depois
+    barFill.style.width = "0%";
     barFill.setAttribute('data-target-width', widthPercent + '%');
 
     barBg.appendChild(barFill);
@@ -201,12 +184,9 @@ function showResult() {
     scoreTable.appendChild(tr);
   });
 
-  // animação das barras (pequeno delay)
   requestAnimationFrame(() => {
-    const fills = document.querySelectorAll('.bar-fill');
-    fills.forEach((el, i) => {
+    document.querySelectorAll('.bar-fill').forEach((el, i) => {
       const target = el.getAttribute('data-target-width') || '0%';
-      // animação com tiny delay por linha
       setTimeout(() => {
         el.style.width = target;
       }, i * 120);
