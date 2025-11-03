@@ -38,11 +38,16 @@ const startBtn = document.getElementById("start-btn");
 const quizContainer = document.getElementById("quiz-container");
 const resultContainer = document.getElementById("result-container");
 const resultText = document.getElementById("result-text");
+const resultExplanation = document.getElementById("result-explanation");
+const scoreTable = document.getElementById("score-table");
+const restartBtn = document.getElementById("restart-btn");
 
 let currentQuestion = 0;
+// pontuação agora: Sim = 1, Mais ou menos = 0.5, Não = 0
 let scores = { Visual: 0, Auditivo: 0, "Leitura/Escrita": 0, Cinestésico: 0 };
 
 startBtn.addEventListener("click", startQuiz);
+restartBtn.addEventListener("click", () => location.reload());
 
 function startQuiz() {
   startBtn.classList.add("hidden");
@@ -63,24 +68,45 @@ function showQuestion() {
     const btn = document.createElement("div");
     btn.textContent = option;
     btn.classList.add("option");
-    btn.onclick = () => selectAnswer(q.type, option);
+    btn.setAttribute("role", "button");
+    btn.setAttribute("tabindex", "0");
+    // permitir seleção por Enter/Space para acessibilidade
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+    btn.onclick = () => selectAnswer(q.type, option, btn);
     quizContainer.appendChild(btn);
   });
 }
 
-function selectAnswer(type, option) {
+function selectAnswer(type, option, clickedBtn) {
   // desativa todas as opções depois do clique
   const options = document.querySelectorAll('.option');
-  options.forEach(btn => btn.onclick = null);
+  options.forEach(btn => {
+    btn.onclick = null;
+    btn.classList.add('disabled');
+  });
 
-  if (option === "Sim") scores[type] += 2;
-  if (option === "Mais ou menos") scores[type] += 1;
+  // aplicação da regra: Sim = 1, Mais ou menos = 0.5, Não = 0
+  if (option === "Sim") scores[type] += 1;
+  if (option === "Mais ou menos") scores[type] += 0.5;
+  // "Não" não adiciona nada
+
+  // pequeno feedback visual
+  if (clickedBtn) {
+    clickedBtn.classList.remove('disabled');
+    clickedBtn.style.boxShadow = "0 0 18px rgba(183,110,255,0.5)";
+  }
 
   currentQuestion++;
   if (currentQuestion < questions.length) {
-    setTimeout(showQuestion, 100);
+    // curtíssima pausa para UX
+    setTimeout(showQuestion, 160);
   } else {
-    showResult();
+    setTimeout(showResult, 220);
   }
 }
 
@@ -88,9 +114,102 @@ function showResult() {
   quizContainer.classList.add("hidden");
   resultContainer.classList.remove("hidden");
 
-  let maxScore = Math.max(...Object.values(scores));
-  let bestTypes = Object.keys(scores).filter(type => scores[type] === maxScore);
-  let bestType = bestTypes[Math.floor(Math.random() * bestTypes.length)];
+  // calcular resultado
+  const values = Object.values(scores);
+  const maxScore = Math.max(...values);
+  const minScore = Math.min(...values);
 
-  resultText.textContent = bestType;
+  // tolerância para considerar "quase igual" -> ajustável
+  const TOLERANCE = 0.5;
+
+  // identificar todos os estilos que alcançam a pontuação máxima (empate exato)
+  let bestTypes = Object.keys(scores).filter(type => Math.abs(scores[type] - maxScore) < 1e-9);
+
+  // checar Multimodal Total (todos os 4 bem próximos)
+  let isMultimodalTotal = (maxScore - minScore) <= TOLERANCE;
+
+  let resultLabel = "";
+  if (isMultimodalTotal) {
+    resultLabel = "Multimodal Total (equilíbrio entre todos os estilos)";
+  } else if (bestTypes.length === 1) {
+    resultLabel = `${bestTypes[0]} (Unimodal)`;
+  } else {
+    // Multimodal parcial (2 ou 3 estilos empatados como maiores)
+    resultLabel = `Multimodal (${bestTypes.join(" + ")})`;
+  }
+
+  // exibir resultado principal
+  resultText.textContent = resultLabel;
+
+  // montar explicação curta
+  let explanation = "";
+  if (isMultimodalTotal) {
+    explanation = "Você tem pontuações bem próximas nos quatro estilos — adapta-se bem a várias formas de aprendizado. Tenta misturar técnicas (gráficos, áudio, leitura e prática).";
+  } else if (bestTypes.length === 1) {
+    explanation = `Seu estilo dominante parece ser <strong>${bestTypes[0]}</strong>. Aproveite métodos focados nesse estilo para aprender mais rápido.`;
+  } else {
+    explanation = `Você tem preferência por múltiplos estilos: <strong>${bestTypes.join("</strong> e <strong>")}</strong>. Combine estratégias desses estilos para melhores resultados.`;
+  }
+  resultExplanation.innerHTML = explanation;
+
+  // construir tabela de pontuação (ordenada)
+  const sorted = Object.entries(scores)
+    .map(([k, v]) => ({ k, v }))
+    .sort((a, b) => b.v - a.v);
+
+  // limpar tabela
+  scoreTable.innerHTML = "";
+
+  // calcular maior possível para normalizar barras (max perguntas por tipo = 4 * 1 = 4)
+  // mas usamos o max alcançado para animação visual.
+  const maxPossible = 4; // 4 perguntas por estilo * 1 ponto por pergunta
+  const highest = Math.max(...sorted.map(x => x.v), 1);
+
+  sorted.forEach(row => {
+    const tr = document.createElement('tr');
+
+    const tdName = document.createElement('td');
+    tdName.classList.add('score-name');
+    tdName.textContent = row.k;
+
+    const tdValue = document.createElement('td');
+    tdValue.classList.add('score-value');
+    // mostrar com uma casa decimal quando tiver .5
+    tdValue.textContent = (Number.isInteger(row.v) ? row.v.toString() : row.v.toFixed(1));
+
+    const tdBar = document.createElement('td');
+    tdBar.classList.add('score-bar');
+
+    const barBg = document.createElement('div');
+    barBg.classList.add('bar-bg');
+
+    const barFill = document.createElement('div');
+    barFill.classList.add('bar-fill');
+
+    // largura relativa (0% - 100%) baseada no maior valor alcançado (para destacar)
+    const widthPercent = Math.round((row.v / highest) * 100);
+    barFill.style.width = "0%"; // iniciar em 0 para animar depois
+    barFill.setAttribute('data-target-width', widthPercent + '%');
+
+    barBg.appendChild(barFill);
+    tdBar.appendChild(barBg);
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdValue);
+    tr.appendChild(tdBar);
+
+    scoreTable.appendChild(tr);
+  });
+
+  // animação das barras (pequeno delay)
+  requestAnimationFrame(() => {
+    const fills = document.querySelectorAll('.bar-fill');
+    fills.forEach((el, i) => {
+      const target = el.getAttribute('data-target-width') || '0%';
+      // animação com tiny delay por linha
+      setTimeout(() => {
+        el.style.width = target;
+      }, i * 120);
+    });
+  });
 }

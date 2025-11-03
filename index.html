@@ -20,7 +20,19 @@
     <div id="result-container" class="hidden">
       <h2>Seu estilo de aprendizado é:</h2>
       <p id="result-text"></p>
-      <button class="btn" onclick="location.reload()">Refazer Teste</button>
+
+      <div id="result-explanation" class="result-box">
+        <!-- Texto explicativo (preenchido pelo JS) -->
+      </div>
+
+      <div id="score-table-container" class="result-box">
+        <h3>Pontuação por estilo</h3>
+        <table id="score-table" aria-live="polite">
+          <!-- Linhas geradas pelo JS -->
+        </table>
+      </div>
+
+      <button class="btn" id="restart-btn">Refazer Teste</button>
     </div>
   </div>
 
