@@ -1,26 +1,29 @@
 const questions = [
   // Visual
+  { type: "Visual", question: "Você entende melhor quando vê gráficos, diagramas ou imagens explicando algo?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Visual", question: "Você prefere mapas e imagens do que textos longos?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Visual", question: "Você gosta de usar cores, setas ou desenhos para organizar suas ideias?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Visual", question: "Você lembra melhor de informações quando vê imagens?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Auditivo
+  { type: "Auditivo", question: "Você aprende melhor ouvindo explicações?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Auditivo", question: "Você costuma prestar mais atenção quando alguém fala?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Auditivo", question: "Você gosta de estudar ouvindo música?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Auditivo", question: "Você entende melhor quando conversa sobre o assunto com outras pessoas?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Leitura/Escrita
+  { type: "Leitura/Escrita", question: "Você prefere ler instruções em vez de assistir vídeos explicativos?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Leitura/Escrita", question: "Você gosta de escrever anotações, resumos e mapas mentais para lembrar das coisas?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Leitura/Escrita", question: "Você entende melhor um conteúdo quando o lê por conta própria?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Leitura/Escrita", question: "Você tem facilidade em aprender lendo textos, artigos ou livros?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Cinestésico
+  { type: "Cinestésico", question: "Você aprende melhor fazendo algo na prática do que só ouvindo ou lendo?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Cinestésico", question: "Você prefere atividades que envolvem movimento ou ação?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Cinestésico", question: "Você entende melhor quando participa ou experimenta o que está aprendendo?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Cinestésico", question: "Você tem mais facilidade em lembrar de algo quando pratica?", options: ["Sim", "Mais ou menos", "Não"] }
 ];
 
-// embaralhar perguntas
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -101,22 +104,22 @@ function showResult() {
   const values = Object.values(scores);
   const maxScore = Math.max(...values);
   const minScore = Math.min(...values);
-  const TOLERANCE = 0.5;
 
-  const bestTypes = Object.keys(scores).filter(type => Math.abs(scores[type] - maxScore) < 1e-9);
-  const isMultimodalTotal = (maxScore - minScore) <= TOLERANCE;
+  const bestTypes = Object.keys(scores).filter(type => scores[type] === maxScore);
+  const allEqual = values.every(v => v === values[0]);
 
   let resultLabel = "";
-  if (isMultimodalTotal) {
+  if (allEqual) {
     resultLabel = "Multimodal Total (equilíbrio entre todos os estilos)";
   } else if (bestTypes.length === 1) {
     resultLabel = `${bestTypes[0]}`;
   } else {
     resultLabel = `Multimodal (${bestTypes.join(" + ")})`;
   }
+
   resultText.textContent = resultLabel;
 
-  // textos específicos por estilo
+ // textos específicos por estilo
   const explanations = {
     "Visual": "Você aprende melhor por meio de recursos visuais, como diagramas, gráficos, imagens e esquemas. Elementos visuais ajudam a compreender e relembrar as informações com mais facilidade. Use cores, setas e mapas mentais para organizar o conteúdo de forma clara e atrativa.",
     "Auditivo": "Seu aprendizado vem pelo som. Você grava melhor quando ouve explicações, debates ou podcasts. Repetir o conteúdo em voz alta e conversar sobre o assunto ajuda a fixar. Se puder, estude explicando pra alguém ou ouvindo áudios educativos.",
@@ -125,13 +128,13 @@ function showResult() {
   };
 
   let explanation = "";
-  if (isMultimodalTotal) {
-    explanation = "Você tem um equilíbrio natural entre todos os estilos de aprendizado. Consegue aprender bem vendo, ouvindo, lendo e praticando. Use essa versatilidade a seu favor: combine imagens e esquemas (Visual), ouça explicações e participe de conversas (Auditivo), faça anotações e resumos (Leitura/Escrita) e aplique o que aprendeu em situações reais (Cinestésico). Essa mistura te torna adaptável e capaz de aprender em praticamente qualquer ambiente.";
+  if (allEqual) {
+    explanation = "Você apresenta equilíbrio entre os quatro estilos de aprendizagem — visual, auditivo, leitura/escrita e cinestésico. Isso significa que você consegue se adaptar com facilidade a diferentes formas de ensino. Misturar técnicas visuais, auditivas, escritas e práticas pode tornar seu aprendizado ainda mais eficiente.";
   } else if (bestTypes.length === 1) {
     const tipo = bestTypes[0];
     explanation = `<strong>${tipo}</strong>: ${explanations[tipo]}`;
   } else {
-    explanation = `Você tem preferência por múltiplos estilos: <strong>${bestTypes.join("</strong>, <strong>")}</strong>. Use o melhor de cada um:<br><br>`;
+    explanation = `Você apresenta características de múltiplos estilos de aprendizagem: <strong>${bestTypes.join("</strong>, <strong>")}</strong>. Essa combinação torna seu aprendizado mais flexível e eficiente.<br><br>`;
     bestTypes.forEach(t => {
       explanation += `<strong>${t}:</strong> ${explanations[t]}<br><br>`;
     });
