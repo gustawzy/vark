@@ -42,6 +42,9 @@ const restartBtn = document.getElementById("restart-btn");
 
 let currentQuestion = 0;
 let scores = { Visual: 0, Auditivo: 0, "Leitura/Escrita": 0, Cinestésico: 0 };
+let answeredQuestions = [];
+let lastAnsweredIndex = null;
+let previousAnswers = {};
 
 startBtn.addEventListener("click", startQuiz);
 restartBtn.addEventListener("click", () => location.reload());
@@ -75,6 +78,15 @@ function showQuestion() {
     btn.onclick = () => selectAnswer(q.type, option, btn);
     quizContainer.appendChild(btn);
   });
+
+  if (answeredQuestions.length > 0) {
+    const corrBtn = document.createElement("button");
+    corrBtn.textContent = "Corrigir";
+    corrBtn.classList.add("btn");
+    corrBtn.style.marginTop = "12px";
+    corrBtn.onclick = () => correctPrevious();
+    quizContainer.appendChild(corrBtn);
+  }
 }
 
 function selectAnswer(type, option, clickedBtn) {
@@ -83,18 +95,46 @@ function selectAnswer(type, option, clickedBtn) {
     btn.classList.add('disabled');
   });
 
-  if (option === "Sim") scores[type] += 1;
-  if (option === "Mais ou menos") scores[type] += 0.5;
+  let scoreToAdd = 0;
+  if (option === "Sim") scoreToAdd = 1;
+  else if (option === "Mais ou menos") scoreToAdd = 0.5;
+
+  scores[type] += scoreToAdd;
+  previousAnswers[currentQuestion] = scoreToAdd;
 
   clickedBtn.classList.remove('disabled');
   clickedBtn.style.boxShadow = "0 0 18px rgba(183,110,255,0.5)";
 
-  currentQuestion++;
-  if (currentQuestion < questions.length) {
-    setTimeout(showQuestion, 160);
-  } else {
-    setTimeout(showResult, 220);
+  lastAnsweredIndex = currentQuestion;
+  if (!answeredQuestions.includes(currentQuestion)) answeredQuestions.push(currentQuestion);
+
+  nextQuestion();
+}
+
+function nextQuestion() {
+  const remainingQuestions = questions
+    .map((_, idx) => idx)
+    .filter(idx => !answeredQuestions.includes(idx));
+
+  if (remainingQuestions.length === 0) {
+    setTimeout(showResult, 200);
+    return;
   }
+
+  currentQuestion = remainingQuestions[Math.floor(Math.random() * remainingQuestions.length)];
+  setTimeout(showQuestion, 150);
+}
+
+function correctPrevious() {
+  if (lastAnsweredIndex === null) return;
+
+  // Remove a pergunta da lista de respondidas para poder mostrar de novo
+  answeredQuestions = answeredQuestions.filter(idx => idx !== lastAnsweredIndex);
+  
+  // Volta pra pergunta que foi respondida
+  currentQuestion = lastAnsweredIndex;
+
+  showQuestion();
 }
 
 function showResult() {
@@ -103,92 +143,63 @@ function showResult() {
 
   const values = Object.values(scores);
   const maxScore = Math.max(...values);
-  const minScore = Math.min(...values);
-
   const bestTypes = Object.keys(scores).filter(type => scores[type] === maxScore);
   const allEqual = values.every(v => v === values[0]);
 
   let resultLabel = "";
-  if (allEqual) {
-    resultLabel = "Multimodal Total (equilíbrio entre todos os estilos)";
-  } else if (bestTypes.length === 1) {
-    resultLabel = `${bestTypes[0]}`;
-  } else {
-    resultLabel = `Multimodal (${bestTypes.join(" + ")})`;
-  }
+  if (allEqual) resultLabel = "Multimodal Total (equilíbrio entre todos os estilos)";
+  else if (bestTypes.length === 1) resultLabel = bestTypes[0];
+  else resultLabel = `Multimodal (${bestTypes.join(" + ")})`;
 
   resultText.textContent = resultLabel;
 
- // textos específicos por estilo
   const explanations = {
-    "Visual": "Você aprende melhor por meio de recursos visuais, como diagramas, gráficos, imagens e esquemas. Elementos visuais ajudam a compreender e relembrar as informações com mais facilidade. Use cores, setas e mapas mentais para organizar o conteúdo de forma clara e atrativa.",
-    "Auditivo": "Seu aprendizado vem pelo som. Você grava melhor quando ouve explicações, debates ou podcasts. Repetir o conteúdo em voz alta e conversar sobre o assunto ajuda a fixar. Se puder, estude explicando pra alguém ou ouvindo áudios educativos.",
-    "Leitura/Escrita": "Você se dá bem com textos. Textos, anotações, listas e resumos são os métodos mais eficazes para o seu aprendizado. Transformar explicações em palavras escritas e reler com atenção ajuda a reforçar o que foi estudado..",
-    "Cinestésico": "Você aprende com a prática. O movimento e o toque te ajudam mais do que ouvir ou ler. Experimente, monte, faça testes e se envolva fisicamente. Aprender só lendo ou vendo te deixa entediado rápido, então leve o conteúdo pra realidade com ações."
+    "Visual": "Você aprende melhor por meio de recursos visuais, como diagramas, gráficos, imagens e esquemas. Use cores, setas e mapas mentais para organizar o conteúdo de forma clara e atrativa.",
+    "Auditivo": "Você aprende ouvindo explicações, debates ou podcasts. Repetir o conteúdo em voz alta ajuda a fixar.",
+    "Leitura/Escrita": "Você se dá bem com textos. Anotações, listas e resumos ajudam no aprendizado.",
+    "Cinestésico": "Você aprende com a prática. Experimente, monte, faça testes e se envolva fisicamente."
   };
 
   let explanation = "";
   if (allEqual) {
-    explanation = "Você apresenta equilíbrio entre os quatro estilos de aprendizagem — visual, auditivo, leitura/escrita e cinestésico. Isso significa que você consegue se adaptar com facilidade a diferentes formas de ensino. Misturar técnicas visuais, auditivas, escritas e práticas pode tornar seu aprendizado ainda mais eficiente.";
+    explanation = "Você apresenta equilíbrio entre os quatro estilos de aprendizagem. Misturar técnicas visuais, auditivas, escritas e práticas pode tornar seu aprendizado mais eficiente.";
   } else if (bestTypes.length === 1) {
-    const tipo = bestTypes[0];
-    explanation = `<strong>${tipo}</strong>: ${explanations[tipo]}`;
+    explanation = `<strong>${bestTypes[0]}</strong>: ${explanations[bestTypes[0]]}`;
   } else {
-    explanation = `Você apresenta características de múltiplos estilos de aprendizagem: <strong>${bestTypes.join("</strong>, <strong>")}</strong>. Essa combinação torna seu aprendizado mais flexível e eficiente.<br><br>`;
-    bestTypes.forEach(t => {
-      explanation += `<strong>${t}:</strong> ${explanations[t]}<br><br>`;
-    });
+    explanation = `Você apresenta características de múltiplos estilos de aprendizagem: <strong>${bestTypes.join("</strong>, <strong>")}</strong>.<br><br>`;
+    bestTypes.forEach(t => explanation += `<strong>${t}:</strong> ${explanations[t]}<br><br>`);
   }
 
   resultExplanation.innerHTML = explanation;
 
-  const sorted = Object.entries(scores)
-    .map(([k, v]) => ({ k, v }))
-    .sort((a, b) => b.v - a.v);
-
+  const sorted = Object.entries(scores).map(([k,v]) => ({k,v})).sort((a,b)=>b.v-a.v);
   scoreTable.innerHTML = "";
-  const highest = Math.max(...sorted.map(x => x.v), 1);
+  const highest = Math.max(...sorted.map(x=>x.v),1);
 
   sorted.forEach(row => {
     const tr = document.createElement('tr');
-
-    const tdName = document.createElement('td');
-    tdName.classList.add('score-name');
-    tdName.textContent = row.k;
-
-    const tdValue = document.createElement('td');
-    tdValue.classList.add('score-value');
-    tdValue.textContent = (Number.isInteger(row.v) ? row.v.toString() : row.v.toFixed(1));
-
+    const tdName = document.createElement('td'); tdName.textContent = row.k;
+    const tdValue = document.createElement('td'); tdValue.textContent = row.v;
     const tdBar = document.createElement('td');
-    tdBar.classList.add('score-bar');
-
-    const barBg = document.createElement('div');
-    barBg.classList.add('bar-bg');
-
-    const barFill = document.createElement('div');
-    barFill.classList.add('bar-fill');
-
-    const widthPercent = Math.round((row.v / highest) * 100);
+    const barBg = document.createElement('div'); barBg.classList.add('bar-bg');
+    const barFill = document.createElement('div'); barFill.classList.add('bar-fill');
     barFill.style.width = "0%";
+    const widthPercent = Math.round((row.v/highest)*100);
     barFill.setAttribute('data-target-width', widthPercent + '%');
-
     barBg.appendChild(barFill);
     tdBar.appendChild(barBg);
-
     tr.appendChild(tdName);
     tr.appendChild(tdValue);
     tr.appendChild(tdBar);
-
     scoreTable.appendChild(tr);
   });
 
+  // animação das barras
   requestAnimationFrame(() => {
-    document.querySelectorAll('.bar-fill').forEach((el, i) => {
+    document.querySelectorAll('.bar-fill').forEach((el) => {
       const target = el.getAttribute('data-target-width') || '0%';
-      setTimeout(() => {
-        el.style.width = target;
-      }, i * 120);
+      el.style.transition = "width 1s ease-in-out";
+      setTimeout(() => { el.style.width = target; }, 100);
     });
   });
 }
