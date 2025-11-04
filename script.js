@@ -114,7 +114,7 @@ function showResult() {
   if (isMultimodalTotal) {
     resultLabel = "Multimodal Total (equilíbrio entre todos os estilos)";
   } else if (bestTypes.length === 1) {
-    resultLabel = `${bestTypes[0]} (Unimodal)`;
+    resultLabel = `${bestTypes[0]}`;
   } else {
     resultLabel = `Multimodal (${bestTypes.join(" + ")})`;
   }
@@ -130,7 +130,7 @@ function showResult() {
 
   let explanation = "";
   if (isMultimodalTotal) {
-    explanation = "Você tem pontuações bem próximas nos quatro estilos — se adapta fácil a qualquer forma de aprendizado. Misture técnicas: leia, ouça, desenhe e pratique.";
+    explanation = "Você tem um equilíbrio natural entre todos os estilos de aprendizado. Consegue aprender bem vendo, ouvindo, lendo e praticando. Use essa versatilidade a seu favor: combine imagens e esquemas (Visual), ouça explicações e participe de conversas (Auditivo), faça anotações e resumos (Leitura/Escrita) e aplique o que aprendeu em situações reais (Cinestésico). Essa mistura te torna adaptável e capaz de aprender em praticamente qualquer ambiente.";
   } else if (bestTypes.length === 1) {
     const tipo = bestTypes[0];
     explanation = `<strong>${tipo}</strong>: ${explanations[tipo]}`;
