@@ -201,3 +201,11 @@ body {
   .score-name { width: 40%; }
   .score-bar { width: 50%; }
 }
+
+/* desabilita seleção de texto no site inteiro */
+body, h1, h2, h3, p, span, div, table, button {
+  -webkit-user-select: none; /* Chrome, Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge antigo */
+  user-select: none;         /* padrão moderno */
+}
