@@ -1,24 +1,20 @@
 const questions = [
   // Visual
-  { type: "Visual", question: "Você entende melhor quando vê gráficos, diagramas ou imagens explicando algo?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Visual", question: "Você prefere mapas e imagens do que textos longos?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Visual", question: "Você gosta de usar cores, setas ou desenhos para organizar suas ideias?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Visual", question: "Você lembra melhor de informações quando vê imagens?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Auditivo
-  { type: "Auditivo", question: "Você aprende melhor ouvindo explicações?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Auditivo", question: "Você costuma prestar mais atenção quando alguém fala?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Auditivo", question: "Você gosta de estudar ouvindo música?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Auditivo", question: "Você entende melhor quando conversa sobre o assunto com outras pessoas?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Leitura/Escrita
-  { type: "Leitura/Escrita", question: "Você prefere ler instruções em vez de assistir vídeos explicativos?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Leitura/Escrita", question: "Você gosta de escrever anotações, resumos e mapas mentais para lembrar das coisas?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Leitura/Escrita", question: "Você entende melhor um conteúdo quando o lê por conta própria?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Leitura/Escrita", question: "Você tem facilidade em aprender lendo textos, artigos ou livros?", options: ["Sim", "Mais ou menos", "Não"] },
 
   // Cinestésico
-  { type: "Cinestésico", question: "Você aprende melhor fazendo algo na prática do que só ouvindo ou lendo?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Cinestésico", question: "Você prefere atividades que envolvem movimento ou ação?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Cinestésico", question: "Você entende melhor quando participa ou experimenta o que está aprendendo?", options: ["Sim", "Mais ou menos", "Não"] },
   { type: "Cinestésico", question: "Você tem mais facilidade em lembrar de algo quando pratica?", options: ["Sim", "Mais ou menos", "Não"] }
@@ -122,10 +118,10 @@ function showResult() {
 
   // textos específicos por estilo
   const explanations = {
-    "Visual": "Você aprende melhor vendo. Diagramas, esquemas, vídeos e gráficos te ajudam a entender rápido. Prefira usar cores, desenhos e anotações visuais — tipo mapas mentais e slides bem ilustrados. Evite explicações muito faladas sem imagens, isso pode te distrair.",
+    "Visual": "Você aprende melhor por meio de recursos visuais, como diagramas, gráficos, imagens e esquemas. Elementos visuais ajudam a compreender e relembrar as informações com mais facilidade. Use cores, setas e mapas mentais para organizar o conteúdo de forma clara e atrativa.",
     "Auditivo": "Seu aprendizado vem pelo som. Você grava melhor quando ouve explicações, debates ou podcasts. Repetir o conteúdo em voz alta e conversar sobre o assunto ajuda a fixar. Se puder, estude explicando pra alguém ou ouvindo áudios educativos.",
-    "Leitura/Escrita": "Você se dá bem com textos. Lendo e escrevendo é onde seu cérebro brilha. Prefira apostilas, artigos, listas e resumos. Escrever o que entendeu e reler com calma faz o conteúdo grudar. Transformar vídeos e aulas faladas em anotações também é uma boa.",
-    "Cinestésico": "Você aprende com a prática. O movimento e o toque te ajudam mais do que ouvir ou ler. Experimente, monte, faça testes e se envolva fisicamente. Aprender só lendo ou vendo te deixa entediado rápido, então traz o conteúdo pra realidade com ações."
+    "Leitura/Escrita": "Você se dá bem com textos. Textos, anotações, listas e resumos são os métodos mais eficazes para o seu aprendizado. Transformar explicações em palavras escritas e reler com atenção ajuda a reforçar o que foi estudado..",
+    "Cinestésico": "Você aprende com a prática. O movimento e o toque te ajudam mais do que ouvir ou ler. Experimente, monte, faça testes e se envolva fisicamente. Aprender só lendo ou vendo te deixa entediado rápido, então leve o conteúdo pra realidade com ações."
   };
 
   let explanation = "";
